@@ -23,4 +23,5 @@ docker run --rm \
 
 APK=client/android/app/build/outputs/apk/release/app-release.apk
 mkdir -p data && cp "$APK" data/comunicador.apk
+docker/android-sdk/build-tools/36.0.0/aapt2 dump badging "$APK" 2>/dev/null | grep -oE "versionName='[^']+'" | cut -d"'" -f2 > data/comunicador.apk.version
 echo ">> OK: data/comunicador.apk ($(du -h data/comunicador.apk | cut -f1))"

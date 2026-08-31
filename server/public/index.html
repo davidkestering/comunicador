@@ -44,7 +44,9 @@
 
   <div class="card">
     <h2>Baixar e instalar (Android)</h2>
-    <a class="btn" href="/comunicador.apk">⬇️ Baixar o Comunicador (APK)</a>
+    <a class="btn" href="/comunicador.apk" onclick="this.href='/comunicador.apk?v='+Date.now()">⬇️ Baixar o Comunicador (APK)</a>
+    <p id="ver"><small>Versão atual: <b>…</b></small></p>
+    <script>fetch('/comunicador.apk.version?v='+Date.now()).then(r=>r.text()).then(v=>{document.querySelector('#ver b').textContent=v.trim()}).catch(()=>{})</script>
     <ol>
       <li>Toque no botão acima. Se o celular perguntar, escolha <b>Baixar mesmo assim</b>.</li>
       <li>Abra o arquivo baixado. Se aparecer "instalação bloqueada", toque em <b>Configurações</b> e permita <b>instalar apps desta fonte</b>; depois volte e toque em <b>Instalar</b>.</li>

@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { createReadStream, existsSync, statSync, mkdirSync, appendFileSync } from 'node:fs';
+import { createReadStream, existsSync, statSync, mkdirSync, appendFileSync, readFileSync } from 'node:fs';
 import { join, extname, normalize } from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DATA_DIR } from './db.js';
@@ -10,7 +10,7 @@ import { listUsers, setName, listMessages, listConversations, sendMessage } from
 const PORT = Number(process.env.PORT || 3000);
 const ORIGINS = (process.env.ORIGINS || 'https://localhost').split(',');
 const PUBLIC_DIR = join(import.meta.dirname, 'public');
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.ico': 'image/x-icon', '.apk': 'application/vnd.android.package-archive', '.webmanifest': 'application/manifest+json' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.ico': 'image/x-icon', '.apk': 'application/vnd.android.package-archive', '.webmanifest': 'application/manifest+json', '.version': 'text/plain' };
 
 const json = (res, status, data) => { res.writeHead(status, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); };
 async function readJson(req) {
@@ -64,11 +64,16 @@ const routes = [
 ];
 
 function serveStatic(req, res, pathname) {
-  let file = pathname === '/comunicador.apk' ? join(DATA_DIR, 'comunicador.apk') : join(PUBLIC_DIR, normalize(pathname).replace(/^(\.\.[/\\])+/, ''));
+  let file = /^\/comunicador\.apk(\.version)?$/.test(pathname) ? join(DATA_DIR, pathname.slice(1)) : join(PUBLIC_DIR, normalize(pathname).replace(/^(\.\.[/\\])+/, ''));
   if (!existsSync(file) || statSync(file).isDirectory()) file = join(PUBLIC_DIR, pathname.startsWith('/app') ? 'app/index.html' : 'index.html'); // SPA fallback
   if (!existsSync(file)) return json(res, 404, { error: 'Não encontrado.' });
   const ext = extname(file);
-  res.writeHead(200, { 'content-type': MIME[ext] || 'application/octet-stream', 'content-length': statSync(file).size, 'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=86400' });
+  const headers = { 'content-type': MIME[ext] || 'application/octet-stream', 'content-length': statSync(file).size, 'cache-control': ext === '.html' || ext === '.apk' ? 'no-cache' : 'public, max-age=86400' };
+  if (ext === '.apk') { // nome com a versão (build-apk.sh grava data/comunicador.apk.version) e nunca em cache
+    const ver = existsSync(file + '.version') ? readFileSync(file + '.version', 'utf8').trim() : '';
+    headers['content-disposition'] = `attachment; filename="comunicador${ver ? '-' + ver : ''}.apk"`;
+  }
+  res.writeHead(200, headers);
   if (req.method === 'HEAD') return res.end();
   createReadStream(file).pipe(res);
 }
