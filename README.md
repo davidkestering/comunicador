@@ -106,6 +106,18 @@ Cobre: vetor de teste TOTP da RFC 6238, cadastro negado fora da lista, cadastro 
 
 Aprendizados: OkHttp 5.5 exige `compileSdk 37` (ficou o 4.12); no Android 15 o tipo `dataSync` morre em 6 h e não pode iniciar no boot — `specialUse` resolve; fabricantes (Xiaomi/Samsung) exigem desativar otimização de bateria e ligar "início automático".
 
+### 2026-08-31 — v1.1 a v1.7 (primeiro uso real, Xiaomi/Android 16)
+
+Sintoma relatado: "o app fecha logo depois do código do Authenticator". Sem `adb` nos celulares, o diagnóstico foi feito com instrumentação enviada ao servidor:
+
+- **v1.1** — faltava `ACCESS_NETWORK_STATE` (exigido por `registerDefaultNetworkCallback`, que derrubaria o serviço com `SecurityException`). Relator de crash (`POST /api/crash` → `data/logs/`).
+- **v1.2–v1.5** — rastro de eventos (JS e Java) gravado num arquivo local do aparelho e enviado na abertura seguinte; motivo oficial da morte do processo (`ApplicationExitInfo`); listener do renderer do WebView. Descoberta: o WebView do aparelho nunca emitia requisições para `/api/crash`, então o envio passou a ir como query de `GET /health?diag=`.
+- **v1.6** — causa real do "fecha": a tela de isenção de bateria era aberta como tarefa separada (`FLAG_ACTIVITY_NEW_TASK`) e, na Xiaomi, ao sair dela o usuário caía na tela inicial. Passou a abrir a partir da Activity, na mesma tarefa.
+- **v1.7** — o serviço abria duas conexões WebSocket (o primeiro `onAvailable` do callback de rede dispara no registro). Corrigido.
+- Servidor: APK entregue sem cache (`no-cache`, nome com versão, link com cache-buster — o navegador do celular reinstalava a v1.0 do cache); fuso `America/Belem`; log de conexões WebSocket.
+
+Resultado: serviço em segundo plano conectado, mensagens trocadas entre dois celulares com o app fechado.
+
 ## Licença
 
 [MIT](LICENSE) — pode baixar, modificar, distribuir e usar comercialmente, desde que mantenha o aviso de copyright e a referência ao projeto original (https://github.com/davidkestering/comunicador) e ao autor, David Kestering.
