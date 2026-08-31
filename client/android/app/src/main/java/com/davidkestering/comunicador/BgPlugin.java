@@ -65,14 +65,11 @@ public class BgPlugin extends Plugin {
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         CrashReporter.trace(ctx, "openBatterySettings ignoring=" + pm.isIgnoringBatteryOptimizations(ctx.getPackageName()));
         if (!pm.isIgnoringBatteryOptimizations(ctx.getPackageName())) {
+            // A partir da Activity e na MESMA tarefa: ao voltar, o usuário cai de novo no app (com NEW_TASK a Xiaomi devolvia à tela inicial).
             try {
-                Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + ctx.getPackageName()));
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ctx.startActivity(i);
+                getActivity().startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + ctx.getPackageName())));
             } catch (Exception e) { // alguns aparelhos não têm essa tela: abre a lista geral
-                try {
-                    ctx.startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                } catch (Exception ignored) {}
+                try { getActivity().startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)); } catch (Exception ignored) {}
             }
         }
         call.resolve();

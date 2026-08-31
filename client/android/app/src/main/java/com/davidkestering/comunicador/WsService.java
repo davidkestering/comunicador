@@ -101,13 +101,15 @@ public class WsService extends Service {
         String wsUrl = url.replaceFirst("^http", "ws") + "/ws?token=" + token;
         ws = client.newWebSocket(new Request.Builder().url(wsUrl).build(), new WebSocketListener() {
             @Override public void onOpen(WebSocket w, Response r) {
+                if (w != ws) { w.close(1000, "stale"); return; }
                 connected = true; delayMs = 2000;
                 CrashReporter.trace(WsService.this, "ws onOpen");
                 update("Conectado");
             }
             @Override public void onMessage(WebSocket w, String text) { handleMessage(text); }
-            @Override public void onClosed(WebSocket w, int code, String reason) { connected = false; scheduleReconnect(); }
+            @Override public void onClosed(WebSocket w, int code, String reason) { if (w != ws) return; connected = false; scheduleReconnect(); }
             @Override public void onFailure(WebSocket w, Throwable t, Response r) {
+                if (w != ws) return; // socket antigo cancelado por reconnectNow(): ignora, senão abre conexão duplicada
                 connected = false;
                 CrashReporter.trace(WsService.this, "ws onFailure " + t + (r != null ? " http=" + r.code() : ""));
                 if (r != null && r.code() == 401) { update("Sessão inválida — abra o app"); return; } // token revogado: não insistir
