@@ -32,8 +32,8 @@ export function connectWs(onEvent) {
 }
 
 // Rastro de diagnóstico: vai para data/logs/crash-*.log no servidor (sem adb nos celulares).
-// Vai como query de GET /api/me (a requisição que comprovadamente funciona no WebView), em pedaços de 1500 chars.
+// Vai como query de GET /health (sem login; GET simples funciona no WebView), em pedaços de 1500 chars.
 export async function trace(msg) {
   const text = String(msg);
-  for (let i = 0; i < text.length && i < 30_000; i += 1500) await api(`/api/me?diag=${encodeURIComponent(text.slice(i, i + 1500))}`).catch(() => {});
+  for (let i = 0; i < text.length && i < 30_000; i += 1500) await api(`/health?diag=${encodeURIComponent(text.slice(i, i + 1500))}`).catch(() => {});
 }

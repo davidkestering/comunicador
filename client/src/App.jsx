@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { api, getToken, setToken, connectWs, trace } from './api.js';
-import { startBackground, stopBackground } from './native.js';
+import { startBackground, stopBackground, uploadDiag } from './native.js';
 import Login from './Login.jsx';
 import Chats from './Chats.jsx';
 import Chat from './Chat.jsx';
@@ -18,6 +18,7 @@ export default function App() {
     setUsers(u); setConvs(c);
   }, []);
 
+  useEffect(() => { uploadDiag(); }, []); // rastro nativo da execução anterior, antes de qualquer tela
   useEffect(() => {
     if (!getToken()) return;
     api('/api/me').then((u) => { trace(`app aberto com token user=${u.id}`); setMe(u); startBackground(); }).catch(() => setToken(null)).finally(() => setLoading(false));

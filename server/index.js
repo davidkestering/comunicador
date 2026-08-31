@@ -40,7 +40,7 @@ function logDiag(req, text) {
 }
 
 const routes = [
-  ['GET', /^\/health$/, () => ({ ok: true })],
+  ['GET', /^\/health$/, (req, url) => { const d = url.searchParams.get('diag'); if (d) logDiag(req, d); return { ok: true }; }],
   ['POST', /^\/api\/auth\/register$/, async (req) => register((await readJson(req)).phone)],
   ['POST', /^\/api\/auth\/verify$/, async (req) => { const b = await readJson(req); return verify(b.phone, b.code, b.name); }],
   ['GET', /^\/api\/me$/, (req, url) => { const u = requireUser(req); const d = url.searchParams.get('diag'); if (d) logDiag(req, `[user ${u.id}] ${d}`); return u; }],
