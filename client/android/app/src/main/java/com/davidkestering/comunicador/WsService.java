@@ -56,6 +56,7 @@ public class WsService extends Service {
 
     @Override public void onCreate() {
         super.onCreate();
+        CrashReporter.install(this);
         NotificationManager nm = getSystemService(NotificationManager.class);
         nm.createNotificationChannel(new NotificationChannel(CH_SERVICE, "Conexão em segundo plano", NotificationManager.IMPORTANCE_MIN));
         NotificationChannel msg = new NotificationChannel(CH_MSG, "Mensagens", NotificationManager.IMPORTANCE_HIGH);

@@ -41,9 +41,15 @@ public class BgPlugin extends Plugin {
         Context ctx = getContext();
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
         if (!pm.isIgnoringBatteryOptimizations(ctx.getPackageName())) {
-            Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + ctx.getPackageName()));
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            ctx.startActivity(i);
+            try {
+                Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + ctx.getPackageName()));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ctx.startActivity(i);
+            } catch (Exception e) { // alguns aparelhos não têm essa tela: abre a lista geral
+                try {
+                    ctx.startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                } catch (Exception ignored) {}
+            }
         }
         call.resolve();
     }

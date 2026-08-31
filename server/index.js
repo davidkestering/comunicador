@@ -48,6 +48,10 @@ const routes = [
     return msg;
   }],
   ['PUT', /^\/api\/files$/, (req) => saveUpload(req, requireUser(req))],
+  ['POST', /^\/api\/crash$/, async (req) => { // relatório de crash do APK (sem adb nos celulares) -> docker logs
+    let raw = ''; for await (const c of req) { raw += c; if (raw.length > 65_536) break; }
+    console.error(`[crash ${new Date().toISOString()}] ${raw}`); return { ok: true };
+  }],
 ];
 
 function serveStatic(req, res, pathname) {
