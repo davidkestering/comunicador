@@ -1,5 +1,5 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
-import { API, api, getToken, trace } from './api.js';
+import { API, getToken, trace } from './api.js';
 
 const Bg = registerPlugin('Bg');
 export const isNative = Capacitor.isNativePlatform();
@@ -9,7 +9,7 @@ export async function uploadDiag() {
   if (!isNative) return;
   try {
     const { text } = await Bg.getDiag();
-    if (text) await api('/api/crash', { method: 'POST', body: { text: `diag(java) enviado em ${new Date().toISOString()}\n${text}` } });
+    if (text) await trace(`diag(java) enviado em ${new Date().toISOString()}\n${text}`);
   } catch (e) { trace(`uploadDiag ERRO: ${e?.message || e}`); }
 }
 

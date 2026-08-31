@@ -31,11 +31,19 @@ function notify(userId, payload) {
   for (const ws of sockets.get(userId) || []) if (ws.readyState === ws.OPEN) ws.send(data);
 }
 
+// Diagnóstico vindo dos celulares -> data/logs/crash-AAAA-MM-DD.log + docker logs
+function logDiag(req, text) {
+  const entry = `[crash ${new Date().toISOString()} ip=${req.headers['x-real-ip'] || req.socket.remoteAddress}]\n${text}\n\n`;
+  mkdirSync(join(DATA_DIR, 'logs'), { recursive: true });
+  appendFileSync(join(DATA_DIR, 'logs', `crash-${new Date().toISOString().slice(0, 10)}.log`), entry);
+  console.error(entry);
+}
+
 const routes = [
   ['GET', /^\/health$/, () => ({ ok: true })],
   ['POST', /^\/api\/auth\/register$/, async (req) => register((await readJson(req)).phone)],
   ['POST', /^\/api\/auth\/verify$/, async (req) => { const b = await readJson(req); return verify(b.phone, b.code, b.name); }],
-  ['GET', /^\/api\/me$/, (req) => requireUser(req)],
+  ['GET', /^\/api\/me$/, (req, url) => { const u = requireUser(req); const d = url.searchParams.get('diag'); if (d) logDiag(req, `[user ${u.id}] ${d}`); return u; }],
   ['PATCH', /^\/api\/me$/, async (req) => setName(requireUser(req), (await readJson(req)).name)],
   ['GET', /^\/api\/users$/, (req) => { requireUser(req); return listUsers(); }],
   ['GET', /^\/api\/conversations$/, (req) => listConversations(requireUser(req))],
@@ -48,13 +56,10 @@ const routes = [
     return msg;
   }],
   ['PUT', /^\/api\/files$/, (req) => saveUpload(req, requireUser(req))],
-  ['POST', /^\/api\/crash$/, async (req) => { // relatório de crash do APK (sem adb nos celulares) -> data/logs/crash-AAAA-MM-DD.log + docker logs
+  ['POST', /^\/api\/crash$/, async (req) => { // relatório de crash do APK (sem adb nos celulares)
     let raw = ''; for await (const c of req) { raw += c; if (raw.length > 65_536) break; }
     if (raw.startsWith('{')) { try { raw = JSON.parse(raw).text ?? raw; } catch {} }
-    const entry = `[crash ${new Date().toISOString()} ip=${req.headers['x-real-ip'] || req.socket.remoteAddress}]\n${raw}\n\n`;
-    mkdirSync(join(DATA_DIR, 'logs'), { recursive: true });
-    appendFileSync(join(DATA_DIR, 'logs', `crash-${new Date().toISOString().slice(0, 10)}.log`), entry);
-    console.error(entry); return { ok: true };
+    logDiag(req, raw); return { ok: true };
   }],
 ];
 
