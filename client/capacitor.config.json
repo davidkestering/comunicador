@@ -1,0 +1,6 @@
+{
+  "appId": "com.davidkestering.comunicador",
+  "appName": "Comunicador",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false }
+}

@@ -52,7 +52,7 @@ const routes = [
 
 function serveStatic(res, pathname) {
   let file = pathname === '/comunicador.apk' ? join(DATA_DIR, 'comunicador.apk') : join(PUBLIC_DIR, normalize(pathname).replace(/^(\.\.[/\\])+/, ''));
-  if (!existsSync(file) || statSync(file).isDirectory()) file = join(PUBLIC_DIR, 'index.html'); // SPA fallback
+  if (!existsSync(file) || statSync(file).isDirectory()) file = join(PUBLIC_DIR, pathname.startsWith('/app') ? 'app/index.html' : 'index.html'); // SPA fallback
   if (!existsSync(file)) return json(res, 404, { error: 'Não encontrado.' });
   const ext = extname(file);
   res.writeHead(200, { 'content-type': MIME[ext] || 'application/octet-stream', 'content-length': statSync(file).size, 'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=86400' });

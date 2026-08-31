@@ -10,3 +10,5 @@ client/android/build/
 client/android/.gradle/
 client/android/local.properties
 .env
+.playwright-mcp/
+*.png
