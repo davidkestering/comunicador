@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comunicador — o mensageiro da família</title>
+<link rel="icon" href="/app/icon.svg">
+<style>
+  :root { --g: #075e54; --l: #25d366; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, Roboto, sans-serif; color: #222; background: #f4f6f5; line-height: 1.55; }
+  header { background: var(--g); color: #fff; padding: 40px 20px 32px; text-align: center; }
+  header img { width: 88px; height: 88px; }
+  h1 { margin: 12px 0 4px; font-size: 32px; }
+  header p { margin: 0; opacity: .9; font-size: 18px; }
+  main { max-width: 680px; margin: 0 auto; padding: 20px; }
+  .card { background: #fff; border-radius: 14px; padding: 20px 22px; margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  h2 { margin: 0 0 10px; color: var(--g); font-size: 20px; }
+  .btn { display: block; text-align: center; background: var(--l); color: #fff; text-decoration: none; font-size: 20px; font-weight: 600; padding: 16px; border-radius: 12px; margin: 10px 0; }
+  .btn.sec { background: #fff; color: var(--g); border: 2px solid var(--g); font-size: 17px; }
+  ol, ul { padding-left: 22px; } li { margin: 6px 0; }
+  small { color: #666; }
+  code { background: #eef2f0; padding: 1px 6px; border-radius: 4px; }
+  footer { text-align: center; color: #777; font-size: 13px; padding: 24px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="/app/icon.svg" alt="">
+  <h1>Comunicador</h1>
+  <p>O mensageiro particular da nossa família</p>
+</header>
+<main>
+  <div class="card">
+    <h2>O que é</h2>
+    <p>Um aplicativo de mensagens só nosso, que roda no nosso próprio servidor. Não depende do WhatsApp, do Google nem de operadora: ninguém de fora pode bloquear, e só entra quem está na lista da família.</p>
+    <ul>
+      <li>💬 Mensagens de texto</li>
+      <li>🎤 Mensagens de voz</li>
+      <li>📎 Envio de fotos, documentos e qualquer arquivo</li>
+      <li>🔔 Avisa quando chega mensagem, mesmo com o app fechado</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Baixar e instalar (Android)</h2>
+    <a class="btn" href="/comunicador.apk">⬇️ Baixar o Comunicador (APK)</a>
+    <ol>
+      <li>Toque no botão acima. Se o celular perguntar, escolha <b>Baixar mesmo assim</b>.</li>
+      <li>Abra o arquivo baixado. Se aparecer "instalação bloqueada", toque em <b>Configurações</b> e permita <b>instalar apps desta fonte</b>; depois volte e toque em <b>Instalar</b>.</li>
+      <li>Abra o Comunicador.</li>
+    </ol>
+    <a class="btn sec" href="/app/">🌐 Ou usar direto no navegador</a>
+  </div>
+
+  <div class="card">
+    <h2>Primeiro acesso (leva 2 minutos)</h2>
+    <ol>
+      <li>Instale o <b>Google Authenticator</b> pela Play Store, se ainda não tiver.</li>
+      <li>No Comunicador, digite seu número <b>completo com +55 e DDD</b> (ex.: <code>+5511999999999</code>) e seu nome. Toque em <b>Continuar</b>.</li>
+      <li>Vai aparecer um código QR. Abra o Google Authenticator, toque em <b>+</b> → <b>Ler código QR</b> e aponte para a tela (ou digite a chave que aparece embaixo do QR). Vai ficar salvo como <b>comunicador (seu número)</b>.</li>
+      <li>Volte ao Comunicador, toque em <b>Já adicionei</b> e digite os 6 números que o Authenticator mostra. Pronto!</li>
+    </ol>
+    <p><small>Para entrar em outro celular, use o mesmo número e o código do Authenticator. Se trocar de celular e perder o Authenticator, avise o David para liberar um novo cadastro.</small></p>
+  </div>
+
+  <div class="card">
+    <h2>Para receber mensagens sempre</h2>
+    <ul>
+      <li>Aceite a permissão de <b>notificações</b> quando o app pedir.</li>
+      <li>Aceite <b>desativar a otimização de bateria</b> para o Comunicador (o app pergunta na primeira vez; também dá para tocar no aviso amarelo na tela de contatos).</li>
+      <li>Em celulares <b>Xiaomi, Samsung, Motorola ou Huawei</b>: em Configurações → Apps → Comunicador, ligue <b>Início automático</b> e marque a bateria como <b>Sem restrições</b>.</li>
+      <li>Vai ficar uma notificação fixa discreta "Comunicador ativo": é normal, é ela que mantém a conexão.</li>
+    </ul>
+  </div>
+</main>
+<footer>Uso particular da família · comunicador.davidkestering.com</footer>
+</body>
+</html>

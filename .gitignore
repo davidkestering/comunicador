@@ -3,7 +3,7 @@ data/
 docker/android-sdk/
 docker/gradle-cache/
 docker/keystore/
-server/public/
+server/public/app/
 client/dist/
 client/android/app/build/
 client/android/build/
