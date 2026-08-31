@@ -13,3 +13,4 @@ client/android/local.properties
 .playwright-mcp/
 *.png
 docker/build.log
+allowed.txt
