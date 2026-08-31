@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, statSync, mkdirSync, appendFileSync } from 'node:fs';
 import { join, extname, normalize } from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DATA_DIR } from './db.js';
@@ -48,9 +48,12 @@ const routes = [
     return msg;
   }],
   ['PUT', /^\/api\/files$/, (req) => saveUpload(req, requireUser(req))],
-  ['POST', /^\/api\/crash$/, async (req) => { // relatório de crash do APK (sem adb nos celulares) -> docker logs
+  ['POST', /^\/api\/crash$/, async (req) => { // relatório de crash do APK (sem adb nos celulares) -> data/logs/crash-AAAA-MM-DD.log + docker logs
     let raw = ''; for await (const c of req) { raw += c; if (raw.length > 65_536) break; }
-    console.error(`[crash ${new Date().toISOString()}] ${raw}`); return { ok: true };
+    const entry = `[crash ${new Date().toISOString()} ip=${req.headers['x-real-ip'] || req.socket.remoteAddress}]\n${raw}\n\n`;
+    mkdirSync(join(DATA_DIR, 'logs'), { recursive: true });
+    appendFileSync(join(DATA_DIR, 'logs', `crash-${new Date().toISOString().slice(0, 10)}.log`), entry);
+    console.error(entry); return { ok: true };
   }],
 ];
 
