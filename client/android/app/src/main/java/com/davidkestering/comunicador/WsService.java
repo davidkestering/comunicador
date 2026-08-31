@@ -67,7 +67,8 @@ public class WsService extends Service {
         // Reconecta na hora quando a rede volta (Wi-Fi <-> dados), sem esperar o backoff.
         ConnectivityManager cm = getSystemService(ConnectivityManager.class);
         netCallback = new ConnectivityManager.NetworkCallback() {
-            @Override public void onAvailable(Network n) { handler.post(() -> { if (running && !connected) reconnectNow(); }); }
+            boolean first = true; // o 1º onAvailable vem na hora do registro (rede atual): não é "rede voltou"
+            @Override public void onAvailable(Network n) { if (first) { first = false; return; } handler.post(() -> { if (running && !connected) reconnectNow(); }); }
         };
         cm.registerDefaultNetworkCallback(netCallback);
         CrashReporter.trace(this, "WsService.onCreate fim");
@@ -90,7 +91,9 @@ public class WsService extends Service {
 
     private void reconnectNow() {
         handler.removeCallbacksAndMessages(null);
-        if (ws != null) ws.cancel();
+        WebSocket old = ws;
+        ws = null; // callbacks do socket antigo passam a ser ignorados (w != ws), mesmo se disparados de forma síncrona
+        if (old != null) old.cancel();
         delayMs = 2000;
         connect();
     }
