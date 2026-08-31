@@ -33,7 +33,7 @@ function notify(userId, payload) {
 
 // Diagnóstico vindo dos celulares -> data/logs/crash-AAAA-MM-DD.log + docker logs
 function logDiag(req, text) {
-  const entry = `[crash ${new Date().toISOString()} ip=${req.headers['x-real-ip'] || req.socket.remoteAddress}]\n${text}\n\n`;
+  const entry = `[crash ${new Date().toLocaleString('sv-SE')} ip=${req.headers['x-real-ip'] || req.socket.remoteAddress}]\n${text}\n\n`; // hora local (TZ do container)
   mkdirSync(join(DATA_DIR, 'logs'), { recursive: true });
   appendFileSync(join(DATA_DIR, 'logs', `crash-${new Date().toISOString().slice(0, 10)}.log`), entry);
   console.error(entry);

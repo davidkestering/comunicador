@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       - NODE_OPTIONS=--max-old-space-size=256
+      - TZ=America/Belem
       - PUBLIC_URL=https://comunicador.davidkestering.com
       - ORIGINS=https://localhost,https://comunicador.davidkestering.com
     volumes:
