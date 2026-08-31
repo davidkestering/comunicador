@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { api, getToken, setToken, connectWs } from './api.js';
+import { api, getToken, setToken, connectWs, trace } from './api.js';
 import { startBackground, stopBackground } from './native.js';
 import Login from './Login.jsx';
 import Chats from './Chats.jsx';
@@ -20,7 +20,7 @@ export default function App() {
 
   useEffect(() => {
     if (!getToken()) return;
-    api('/api/me').then((u) => { setMe(u); startBackground(); }).catch(() => setToken(null)).finally(() => setLoading(false));
+    api('/api/me').then((u) => { trace(`app aberto com token user=${u.id}`); setMe(u); startBackground(); }).catch(() => setToken(null)).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function App() {
   const logout = async () => { await stopBackground(); setToken(null); setMe(null); setOpen(null); };
 
   if (loading) return <div className="center">Carregando…</div>;
-  if (!me) return <Login onLogin={(u) => { setMe(u); startBackground(); }} />;
+  if (!me) return <Login onLogin={(u) => { trace(`login ok user=${u.id}`); setMe(u); startBackground(); }} />;
   if (open) return <Chat me={me} other={open} incoming={incoming} onBack={() => { setOpen(null); refresh(); }} />;
   return <Chats me={me} setMe={setMe} users={users} convs={convs} onOpen={setOpen} onLogout={logout} />;
 }

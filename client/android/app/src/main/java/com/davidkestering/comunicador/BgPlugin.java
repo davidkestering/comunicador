@@ -25,6 +25,7 @@ public class BgPlugin extends Plugin {
         String token = call.getString("token");
         if (url == null || token == null) { call.reject("url e token são obrigatórios"); return; }
         WsService.prefs(getContext()).edit().putString("url", url).putString("token", token).apply();
+        CrashReporter.trace(getContext(), "BgPlugin.start -> WsService.start");
         WsService.start(getContext());
         call.resolve();
     }
@@ -40,6 +41,7 @@ public class BgPlugin extends Plugin {
     public void openBatterySettings(PluginCall call) {
         Context ctx = getContext();
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
+        CrashReporter.trace(ctx, "openBatterySettings ignoring=" + pm.isIgnoringBatteryOptimizations(ctx.getPackageName()));
         if (!pm.isIgnoringBatteryOptimizations(ctx.getPackageName())) {
             try {
                 Intent i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + ctx.getPackageName()));

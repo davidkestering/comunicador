@@ -57,6 +57,7 @@ public class WsService extends Service {
     @Override public void onCreate() {
         super.onCreate();
         CrashReporter.install(this);
+        CrashReporter.trace(this, "WsService.onCreate inicio");
         NotificationManager nm = getSystemService(NotificationManager.class);
         nm.createNotificationChannel(new NotificationChannel(CH_SERVICE, "Conexão em segundo plano", NotificationManager.IMPORTANCE_MIN));
         NotificationChannel msg = new NotificationChannel(CH_MSG, "Mensagens", NotificationManager.IMPORTANCE_HIGH);
@@ -69,10 +70,12 @@ public class WsService extends Service {
             @Override public void onAvailable(Network n) { handler.post(() -> { if (running && !connected) reconnectNow(); }); }
         };
         cm.registerDefaultNetworkCallback(netCallback);
+        CrashReporter.trace(this, "WsService.onCreate fim");
     }
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         ServiceCompat.startForeground(this, NOTIF_SERVICE, serviceNotification("Conectando…"), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        CrashReporter.trace(this, "startForeground ok");
         if (!running) { running = true; connect(); }
         return START_STICKY;
     }
@@ -99,12 +102,14 @@ public class WsService extends Service {
         ws = client.newWebSocket(new Request.Builder().url(wsUrl).build(), new WebSocketListener() {
             @Override public void onOpen(WebSocket w, Response r) {
                 connected = true; delayMs = 2000;
+                CrashReporter.trace(WsService.this, "ws onOpen");
                 update("Conectado");
             }
             @Override public void onMessage(WebSocket w, String text) { handleMessage(text); }
             @Override public void onClosed(WebSocket w, int code, String reason) { connected = false; scheduleReconnect(); }
             @Override public void onFailure(WebSocket w, Throwable t, Response r) {
                 connected = false;
+                CrashReporter.trace(WsService.this, "ws onFailure " + t + (r != null ? " http=" + r.code() : ""));
                 if (r != null && r.code() == 401) { update("Sessão inválida — abra o app"); return; } // token revogado: não insistir
                 scheduleReconnect();
             }

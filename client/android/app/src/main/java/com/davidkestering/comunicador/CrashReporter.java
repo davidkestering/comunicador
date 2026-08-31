@@ -44,6 +44,12 @@ public final class CrashReporter {
         });
     }
 
+    /** Breadcrumb assíncrono (não bloqueia, ignora falhas). */
+    static void trace(Context ctx, String msg) {
+        String url = WsService.prefs(ctx).getString("url", "https://comunicador.davidkestering.com") + "/api/crash";
+        new Thread(() -> send(url, "trace(java): " + msg + " | " + Build.MANUFACTURER + " " + Build.MODEL + " android=" + Build.VERSION.RELEASE)).start();
+    }
+
     private static boolean send(String url, String body) {
         try {
             HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();

@@ -102,7 +102,8 @@ server.on('upgrade', (req, socket, head) => {
     ws.on('message', () => { ws.alive = true; });
     if (!sockets.has(user.id)) sockets.set(user.id, new Set());
     sockets.get(user.id).add(ws);
-    ws.on('close', () => sockets.get(user.id)?.delete(ws));
+    console.log(`[ws] open user=${user.id} ua=${req.headers['user-agent'] || '?'}`);
+    ws.on('close', (code) => { sockets.get(user.id)?.delete(ws); console.log(`[ws] close user=${user.id} code=${code}`); });
     ws.send(JSON.stringify({ t: 'hello', user }));
   });
 });
