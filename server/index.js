@@ -50,12 +50,13 @@ const routes = [
   ['PUT', /^\/api\/files$/, (req) => saveUpload(req, requireUser(req))],
 ];
 
-function serveStatic(res, pathname) {
+function serveStatic(req, res, pathname) {
   let file = pathname === '/comunicador.apk' ? join(DATA_DIR, 'comunicador.apk') : join(PUBLIC_DIR, normalize(pathname).replace(/^(\.\.[/\\])+/, ''));
   if (!existsSync(file) || statSync(file).isDirectory()) file = join(PUBLIC_DIR, pathname.startsWith('/app') ? 'app/index.html' : 'index.html'); // SPA fallback
   if (!existsSync(file)) return json(res, 404, { error: 'Não encontrado.' });
   const ext = extname(file);
   res.writeHead(200, { 'content-type': MIME[ext] || 'application/octet-stream', 'content-length': statSync(file).size, 'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=86400' });
+  if (req.method === 'HEAD') return res.end();
   createReadStream(file).pipe(res);
 }
 
@@ -74,7 +75,7 @@ const server = createServer(async (req, res) => {
     for (const [method, re, handler] of routes) {
       if (req.method === method && re.test(url.pathname)) return json(res, 200, await handler(req, url));
     }
-    if (req.method === 'GET') return serveStatic(res, url.pathname);
+    if (req.method === 'GET' || req.method === 'HEAD') return serveStatic(req, res, url.pathname);
     json(res, 404, { error: 'Rota não encontrada.' });
   } catch (e) {
     if (!(e instanceof HttpError)) console.error(e);
