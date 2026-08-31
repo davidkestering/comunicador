@@ -1,4 +1,0 @@
->> Build do client web + sync Capacitor
->> Gradle assembleRelease no container (primeira vez baixa SDK/Gradle: ~10 min)
->> OK: data/comunicador.apk (3.6M)
-EXIT=0

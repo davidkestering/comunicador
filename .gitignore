@@ -12,3 +12,4 @@ client/android/local.properties
 .env
 .playwright-mcp/
 *.png
+docker/build.log
