@@ -32,4 +32,4 @@ export function connectWs(onEvent) {
 }
 
 // Rastro de diagnóstico: vai para data/logs/crash-*.log no servidor (sem adb nos celulares).
-export const trace = (msg) => fetch(`${API}/api/crash`, { method: 'POST', body: `trace(js): ${msg} | ${navigator.userAgent}` }).catch(() => {});
+export const trace = (msg) => api('/api/crash', { method: 'POST', body: { text: `trace(js): ${msg} | ${navigator.userAgent}` } }).catch(() => {});

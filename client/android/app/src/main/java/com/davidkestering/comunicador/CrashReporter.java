@@ -17,6 +17,18 @@ import java.nio.charset.StandardCharsets;
 public final class CrashReporter {
     private static boolean installed = false;
 
+    /** Rastro local síncrono: sobrevive à morte do processo; o JS envia na próxima abertura (Bg.getDiag). */
+    static synchronized void log(Context ctx, String msg) {
+        try {
+            File f = new File(ctx.getFilesDir(), "diag.log");
+            if (f.length() > 500_000) f.delete();
+            try (FileOutputStream fo = new FileOutputStream(f, true)) {
+                fo.write((new java.util.Date() + " pid=" + android.os.Process.myPid() + " " + msg + "\n").getBytes(StandardCharsets.UTF_8));
+                fo.getFD().sync();
+            }
+        } catch (Exception ignored) {}
+    }
+
     static synchronized void install(Context ctx) {
         if (installed) return;
         installed = true;
@@ -35,6 +47,7 @@ public final class CrashReporter {
             error.printStackTrace(new PrintWriter(sw));
             String body = "app=" + appVersion + " device=" + Build.MANUFACTURER + " " + Build.MODEL + " android=" + Build.VERSION.RELEASE
                 + " thread=" + thread.getName() + " at=" + new java.util.Date() + "\n" + sw;
+            log(ctx, "CRASH " + body);
             final boolean[] sent = { false };
             Thread t = new Thread(() -> sent[0] = send(url, body));
             t.start();
@@ -46,6 +59,7 @@ public final class CrashReporter {
 
     /** Breadcrumb assíncrono (não bloqueia, ignora falhas). */
     static void trace(Context ctx, String msg) {
+        log(ctx, msg);
         String url = WsService.prefs(ctx).getString("url", "https://comunicador.davidkestering.com") + "/api/crash";
         new Thread(() -> send(url, "trace(java): " + msg + " | " + Build.MANUFACTURER + " " + Build.MODEL + " android=" + Build.VERSION.RELEASE)).start();
     }

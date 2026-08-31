@@ -30,6 +30,28 @@ public class BgPlugin extends Plugin {
         call.resolve();
     }
 
+    /** Devolve e limpa o rastro local (diag.log) para o JS enviar ao servidor. */
+    @PluginMethod
+    public void getDiag(PluginCall call) {
+        java.io.File f = new java.io.File(getContext().getFilesDir(), "diag.log");
+        String text = "";
+        try { if (f.exists()) { text = new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8); f.delete(); } } catch (Exception ignored) {}
+        // Motivo registrado pelo Android para as últimas mortes do processo (crash, ANR, morto pelo sistema...).
+        try {
+            android.app.ActivityManager am = (android.app.ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+            StringBuilder sb = new StringBuilder();
+            for (android.app.ApplicationExitInfo e : am.getHistoricalProcessExitReasons(null, 0, 3)) {
+                sb.append("EXIT reason=").append(e.getReason()).append(" status=").append(e.getStatus())
+                  .append(" at=").append(new java.util.Date(e.getTimestamp())).append(" importance=").append(e.getImportance())
+                  .append(" desc=").append(e.getDescription()).append("\n");
+            }
+            if (sb.length() > 0) text += "\n" + sb;
+        } catch (Exception ignored) {}
+        com.getcapacitor.JSObject r = new com.getcapacitor.JSObject();
+        r.put("text", text);
+        call.resolve(r);
+    }
+
     @PluginMethod
     public void stop(PluginCall call) {
         WsService.prefs(getContext()).edit().clear().apply();

@@ -50,6 +50,7 @@ const routes = [
   ['PUT', /^\/api\/files$/, (req) => saveUpload(req, requireUser(req))],
   ['POST', /^\/api\/crash$/, async (req) => { // relatório de crash do APK (sem adb nos celulares) -> data/logs/crash-AAAA-MM-DD.log + docker logs
     let raw = ''; for await (const c of req) { raw += c; if (raw.length > 65_536) break; }
+    if (raw.startsWith('{')) { try { raw = JSON.parse(raw).text ?? raw; } catch {} }
     const entry = `[crash ${new Date().toISOString()} ip=${req.headers['x-real-ip'] || req.socket.remoteAddress}]\n${raw}\n\n`;
     mkdirSync(join(DATA_DIR, 'logs'), { recursive: true });
     appendFileSync(join(DATA_DIR, 'logs', `crash-${new Date().toISOString().slice(0, 10)}.log`), entry);
