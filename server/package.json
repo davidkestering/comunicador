@@ -1,0 +1,12 @@
+{
+  "name": "comunicador-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning index.js",
+    "test": "node --no-warnings=ExperimentalWarning --test test.js"
+  },
+  "dependencies": {
+    "ws": "8.21.3"
+  }
+}

@@ -1,0 +1,18 @@
+services:
+  api:
+    build: ./server
+    container_name: comunicador-api
+    restart: unless-stopped
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=256
+      - PUBLIC_URL=https://comunicador.davidkestering.com
+      - ORIGINS=https://localhost,https://comunicador.davidkestering.com
+    volumes:
+      - ./data:/app/data
+      - ./allowed.txt:/app/allowed.txt:ro
+    networks:
+      - proxy-net   # proxy-nginx central roteia comunicador.davidkestering.com -> comunicador-api:3000
+
+networks:
+  proxy-net:
+    external: true
